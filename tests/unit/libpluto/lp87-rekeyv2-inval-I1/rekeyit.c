@@ -21,6 +21,22 @@ void recv_pcap_packet(u_char *user
     run_continuation(crypto_req);
 }
 
+/* this is our override to the unpack_nonce() in prgrams/pluto/ipsec_doi.c */
+static int unpack_nonce_will_corrupt = 0;
+void unpack_nonce(chunk_t *n, struct pluto_crypto_req *r)
+{
+    struct pcr_kenonce *kn = &r->pcr_d.kn;
+
+    freeanychunk(*n);
+    clonetochunk(*n, wire_chunk_ptr(kn, &(kn->n))
+                 , DEFAULT_NONCE_SIZE, "initiator nonce");
+
+    if (unpack_nonce_will_corrupt) {
+	    openswan_log("corrupting the nonce");
+	    n->len = 2;
+    }
+}
+
 #define PCAP_INPUT_COUNT 2
 recv_pcap recv_inputs[PCAP_INPUT_COUNT]={
     recv_pcap_packet,
@@ -45,6 +61,9 @@ void rekeyit()
     send_packet_setup_pcap("OUTPUT/" TESTNAME ".pcap");
 
     if(st) {
+        /* for this packet, we will corrupt */
+        unpack_nonce_will_corrupt = 1;
+
         DBG(DBG_LIFECYCLE
             , openswan_log("replacing stale %s SA"
                            , (IS_PHASE1(st->st_state)|| IS_PHASE15(st->st_state ))? "ISAKMP" : "IPsec"));
