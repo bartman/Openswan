@@ -246,7 +246,6 @@ accept_KE(chunk_t *dest, const char *val_name
     return NOTHING_WRONG;
 }
 
-__attribute__((weak))
 void
 unpack_nonce(chunk_t *n, struct pluto_crypto_req *r)
 {
