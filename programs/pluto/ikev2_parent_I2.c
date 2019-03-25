@@ -476,9 +476,14 @@ static stf_status ikev2parent_retry_next_proposal(struct msg_digest *md)
     /* move to the next proposal */
     c->proposal_index ++;
 
+openswan_log("XXX %s:%u state #%ld whack_sock=%d", __func__, __LINE__,
+         st->st_serialno, st->st_whack_sock);
+
     /* look up the parent */
     if (!pst && st->st_clonedfrom) {
         pst = state_with_serialno(st->st_clonedfrom);
+openswan_log("XXX %s:%u parent #%ld whack_sock=%d", __func__, __LINE__,
+         pst->st_serialno, pst->st_whack_sock);
     }
 
     /* make sure we release all algorithm SPIs */
@@ -517,13 +522,18 @@ static stf_status ikev2parent_retry_next_proposal(struct msg_digest *md)
         st->st_whack_sock = NULL_FD;
     }
 
+openswan_log("XXX %s:%u will retry #%ld whack_sock=%d", __func__, __LINE__,
+         st->st_serialno, whack_sock);
+
     /* delete the old state */
 
+openswan_log("XXX %s:%u delete child #%ld", __func__, __LINE__, st->st_serialno);
     delete_event(st);
     change_state(st, STATE_IKESA_DEL);
     delete_state(st);
 
     if (pst && pst != st) {
+openswan_log("XXX %s:%u delete parent #%ld", __func__, __LINE__, pst->st_serialno);
         delete_event(pst);
 	delete_state(pst);
     }
@@ -531,6 +541,8 @@ static stf_status ikev2parent_retry_next_proposal(struct msg_digest *md)
     reset_globals();
 
     /* start a new attempt */
+
+openswan_log("XXX %s:%u -> outI1() proposal_index=%d", __func__, __LINE__, c->proposal_index);
 
     stf = ikev2parent_outI1(whack_sock
               , c
@@ -540,6 +552,9 @@ static stf_status ikev2parent_retry_next_proposal(struct msg_digest *md)
               , 1
               , pcim_demand_crypto
               , NULL_POLICY);
+
+openswan_log("XXX %s:%u <- outI1() created=%ld stf=%d/%s", __func__, __LINE__,
+         created, stf, stf_status_name(stf));
 
     switch (stf) {
     case STF_OK:

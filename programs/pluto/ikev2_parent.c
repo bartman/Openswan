@@ -278,6 +278,8 @@ stf_status ikev2_encrypt_msg(struct msg_digest *md,
 
         memcpy(savediv, iv, blocksize);
 
+	DBG_dump("XXX encr key", cipherkey->ptr, cipherkey->len);
+
         /* now, encrypt */
         (pst->st_oakley.encrypter->do_crypt)(encstart,
                                             cipherlen,
@@ -297,6 +299,14 @@ stf_status ikev2_encrypt_msg(struct msg_digest *md,
         hmac_final(authloc, &ctx);
 
         DBG(DBG_PARSING,
+	    DBG_log("XXX auth %lu bytes using %d/%d %s keylen=%lu",
+		    authloc-authstart,
+		    pst->st_oakley.integ_hasher->common.algo_type,
+		    pst->st_oakley.integ_hasher->common.algo_id,
+		    pst->st_oakley.integ_hasher->common.officname,
+		    authkey->len);
+            DBG_dump("XXX auth key", authkey->ptr, authkey->len);
+
             DBG_dump("data being hmac:", authstart, authloc-authstart);
             DBG_dump("out calculated auth:", authloc, pst->st_oakley.integ_hasher->hash_integ_len);
             );
@@ -351,6 +361,14 @@ stf_status ikev2_decrypt_msg(struct msg_digest *md
         hmac_final(b12, &ctx);
 
         DBG(DBG_PARSING,
+	    DBG_log("XXX auth %lu bytes using %d/%d %s keylen=%lu",
+		    encend-authstart,
+		    pst->st_oakley.integ_hasher->common.algo_type,
+		    pst->st_oakley.integ_hasher->common.algo_id,
+		    pst->st_oakley.integ_hasher->common.officname,
+		    authkey->len);
+            DBG_dump("XXX auth key", authkey->ptr, authkey->len);
+
             DBG_dump("data being hmac:", authstart, encend-authstart);
             DBG_dump("R2 calculated auth:", b12, pst->st_oakley.integ_hasher->hash_integ_len);
             DBG_dump("R2  provided  auth:", encend, pst->st_oakley.integ_hasher->hash_integ_len);
@@ -361,8 +379,12 @@ stf_status ikev2_decrypt_msg(struct msg_digest *md
         if(memcmp(b12, encend, pst->st_oakley.integ_hasher->hash_integ_len)!=0) {
             openswan_log("R2 failed to match authenticator");
 
+openswan_log("XXX %s:%u c->proposal_can_retry=%d", __func__, __LINE__, st->st_connection->proposal_can_retry);
+
             /* force the notification to go out on the next message ID */
             st->st_msgid = md->msgid_received;
+
+openswan_log("XXX %s:%u force st_msgid = %d", __func__, __LINE__, st->st_msgid);
 
             return STF_FAIL + AUTHENTICATION_FAILED;
         }
@@ -649,6 +671,8 @@ send_v2_notification(struct state *p1st
         memcpy(n_hdr.isa_icookie, icookie, COOKIE_SIZE);
         n_hdr.isa_xchg = xchg_type;
         n_hdr.isa_np = ISAKMP_NEXT_v2N;
+
+openswan_log("XXX %s:%u #%lu p1st->st_msgid = %u (0x%x)", __func__, __LINE__, p1st->st_serialno, p1st->st_msgid, p1st->st_msgid);
 
         n_hdr.isa_flags = ISAKMP_FLAGS_R|IKEv2_ORIG_INITIATOR_FLAG(p1st);
         n_hdr.isa_msgid = htonl(p1st->st_msgid);

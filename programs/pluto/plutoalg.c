@@ -333,6 +333,8 @@ alg_info_snprint_ike(char *buf, size_t buflen, struct alg_info_ike *alg_info)
 		&& (ike_alg_hash_present(ike_info->ike_halg))
 		&& (lookup_group(ike_info->ike_modp))) {
 
+DBG_log("XXX %s:%u lookup ike_info->ike_modp = %d", __func__, __LINE__, ike_info->ike_modp);
+
 		enc_desc=ike_alg_get_encrypter(ike_info->ike_ealg);
 		passert(enc_desc != NULL);
 		hash_desc=ike_alg_get_hasher(ike_info->ike_halg);

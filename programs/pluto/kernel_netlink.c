@@ -588,6 +588,8 @@ netlink_policy(struct nlmsghdr *hdr, bool enoent_ok, const char *text_said)
     } rsp;
     int error;
 
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
+
     rsp.n.nlmsg_type = NLMSG_ERROR;
     if (!send_netlink_msg(hdr, &rsp.n, sizeof(rsp), "policy", text_said))
     {
@@ -661,6 +663,8 @@ netlink_raw_eroute(const ip_address *this_host
     bool ok;
     bool enoent_ok;
     ip_subnet local_client;
+
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 
     if(DBGP(DBG_NETKEY) || 1) {
         char sa_this[ADDRTOT_BUF];
@@ -948,6 +952,8 @@ netlink_add_sa(struct kernel_sa *sa, bool replace)
     struct rtattr *attr;
     struct aead_alg *aead;
     bool ret;
+
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 
     memset(&req, 0, sizeof(req));
     req.n.nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
@@ -1282,6 +1288,8 @@ netlink_del_sa(const struct kernel_sa *sa)
 	char data[1024];
     } req;
 
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
+
     memset(&req, 0, sizeof(req));
     req.n.nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
     req.n.nlmsg_type = XFRM_MSG_DELSA;
@@ -1437,6 +1445,7 @@ linux_pfkey_add_aead(void)
 static void
 linux_pfkey_register_response(const struct sadb_msg *msg)
 {
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
     switch (msg->sadb_msg_satype)
     {
     case SADB_SATYPE_ESP:
@@ -1460,6 +1469,7 @@ linux_pfkey_register_response(const struct sadb_msg *msg)
 static void
 linux_pfkey_register(void)
 {
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
     netlink_register_proto(SADB_SATYPE_AH, "AH");
     netlink_register_proto(SADB_SATYPE_ESP, "ESP");
     netlink_register_proto(SADB_X_SATYPE_IPCOMP, "IPCOMP");
@@ -1512,6 +1522,8 @@ netlink_acquire(struct nlmsghdr *n)
 
     DBG(DBG_NETKEY, DBG_log("xfrm netlink msg len %lu", (unsigned long) n->nlmsg_len));
 #endif
+
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 
     if (n->nlmsg_len < NLMSG_LENGTH(sizeof(*acquire)))
     {
@@ -1651,6 +1663,8 @@ netlink_shunt_expire(struct xfrm_userpolicy_info *pol)
     unsigned transport_proto;
     err_t ugh = NULL;
 
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
+
     srcx = &pol->sel.saddr;
     dstx = &pol->sel.daddr;
     family = pol->sel.family;
@@ -1684,6 +1698,8 @@ netlink_policy_expire(struct nlmsghdr *n)
 	struct xfrm_userpolicy_info pol;
 	char data[1024];
     } rsp;
+
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 
     if (n->nlmsg_len < NLMSG_LENGTH(sizeof(*upe)))
     {
@@ -1757,6 +1773,8 @@ netlink_get(void)
     ssize_t r;
     struct sockaddr_nl addr;
     socklen_t alen;
+
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 
     alen = sizeof(addr);
     r = recvfrom(netlink_bcast_fd, &rsp, sizeof(rsp), 0
@@ -1843,6 +1861,8 @@ netlink_get_spi(const ip_address *src
     } rsp;
     static int get_cpi_bug;
 
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
+
     memset(&req, 0, sizeof(req));
     req.n.nlmsg_flags = NLM_F_REQUEST;
     req.n.nlmsg_type = XFRM_MSG_ALLOCSPI;
@@ -1911,6 +1931,8 @@ netlink_sag_eroute(struct state *st, const struct spd_route *sr
     struct pfkey_proto_info proto_info[PROTO_INFO_COUNT];
     int i;
     bool tunnel;
+
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 
     /* figure out the SPI and protocol (in two forms)
      * for the innermost transformation.
@@ -1999,6 +2021,8 @@ netlink_eroute_idle(struct state *st, time_t idle_max)
 {
     time_t idle_time;
 
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
+
     passert(st != NULL);
     if(!get_sa_info(st, TRUE, &idle_time))
     	return TRUE;
@@ -2014,6 +2038,8 @@ netlink_shunt_eroute(struct connection *c
 		   , const char *opname)
 {
     ipsec_spi_t spi;
+
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 
     DBG(DBG_CONTROL, DBG_log("request to %s a %s policy with netkey kernel --- experimental"
 		, opname
@@ -2149,6 +2175,9 @@ netlink_process_raw_ifaces(struct raw_iface *rifaces)
 {
     struct raw_iface *ifp;
     ip_address lip; /* --listen filter option */
+
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
+
     if(pluto_listen) {
 	err_t e;
 	e = ttoaddr(pluto_listen,0,0,&lip);
@@ -2416,6 +2445,8 @@ netlink_get_sa(const struct kernel_sa *sa, u_int *bytes)
 	char data[1024];
     } rsp;
 
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
+
      memset(&req, 0, sizeof(req));
     req.n.nlmsg_flags = NLM_F_REQUEST;
     req.n.nlmsg_type = XFRM_MSG_GETSA;
@@ -2443,6 +2474,8 @@ netkey_do_command(struct connection *c, const struct spd_route *sr
 {
     char cmd[2048];     /* arbitrary limit on shell command length */
     char common_shell_out_str[2048];
+
+DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 
     if(fmt_common_shell_out(common_shell_out_str, sizeof(common_shell_out_str), c, sr, st)==-1) {
 	loglog(RC_LOG_SERIOUS, "%s%s command too long!", verb, verb_suffix);

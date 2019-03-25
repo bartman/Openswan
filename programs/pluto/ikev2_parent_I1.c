@@ -227,6 +227,7 @@ ikev2parent_outI1_withstate(struct state *st
         st->st_sadb = &oakley_sadb[policy_index];
     st->st_sadb = sa_v2_convert(st->st_sadb);
 
+DBG_log("XXX %s:%u proposal_index = %d", __func__, __LINE__, c->proposal_index);
     groupnum = guess_dhgroup(st, c);
     if (groupnum < 0) {
         /* we had groups, but we tried them all already */
@@ -237,6 +238,7 @@ ikev2parent_outI1_withstate(struct state *st
         groupnum = OAKLEY_GROUP_MODP2048;
     }
 
+DBG_log("XXX %s:%u lookup groupnum = %d", __func__, __LINE__, groupnum);
     st->st_oakley.group=lookup_group(groupnum);
     st->st_oakley.groupnum=groupnum;
 

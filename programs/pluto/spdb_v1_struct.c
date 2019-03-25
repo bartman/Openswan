@@ -493,6 +493,7 @@ out_sa(pb_stream *outs
 					       , tunnel_mode)) {
 				return FALSE;
 			    }
+DBG_log("IKEv1 %s:%u pi->our_spi=%08x", __func__, __LINE__, pi->our_spi);
 			    *spi_generated = TRUE;
                         }
                         if (!out_raw((u_char *)&pi->our_spi, IPSEC_DOI_SPI_SIZE
@@ -1964,7 +1965,8 @@ echo_proposal(struct state *st,
 		      IPPROTO_AH : IPPROTO_ESP
 		      , st
 		      , tunnel_mode);
-	
+
+DBG_log("IKEv1 %s:%u pi->our_spi=%08x", __func__, __LINE__, pi->our_spi);
 	/* XXX should check for errors */
 	out_raw((u_char *) &pi->our_spi, IPSEC_DOI_SPI_SIZE
 		, &r_proposal_pbs, "SPI");

@@ -1858,6 +1858,7 @@ void pfkey_remove_orphaned_holds(int transport_proto
 				 , const ip_subnet *ours
 				 , const ip_subnet *his)
 {
+DBG_log("XXX %s:%u ...", __func__, __LINE__);
     /*
      * if present, remove from orphaned_holds list.
      * NOTE: we do this last in case ours or his is a pointer into a member.

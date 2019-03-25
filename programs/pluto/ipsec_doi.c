@@ -190,6 +190,8 @@ unpack_KE(struct state *st
 {
     struct pcr_kenonce *kn = &r->pcr_d.kn;
 
+DBG_log("XXX %s:%u st->st_sec_in_use = %d", __func__, __LINE__, st->st_sec_in_use);
+
     if (!st->st_sec_in_use)
     {
 	st->st_sec_in_use = TRUE;
@@ -203,13 +205,20 @@ unpack_KE(struct state *st
 		     , wire_chunk_ptr(kn, &(kn->secret))
 		     , kn->secret.len, "pointer to DH private key (secret)");
 
+DBG_log("XXX %s:%u kn->secret.len = %ld", __func__, __LINE__, kn->secret.len);
+
 	clonetochunk(st->pubk
 		     , wire_chunk_ptr(kn, &(kn->pubk))
 		     , kn->pubk.len, "pointer to DH public key");
+
+DBG_log("XXX %s:%u kn->pubk.len = %ld", __func__, __LINE__, kn->pubk.len);
 #else
 	n_to_mpz(&st->st_sec
 		 , wire_chunk_ptr(kn, &(kn->secret))
 		 , kn->secret.len);
+
+DBG_log("XXX %s:%u kn->secret.len = %ld", __func__, __LINE__, kn->secret.len);
+
 	clonetochunk(st->st_sec_chunk
 		     , wire_chunk_ptr(kn, &(kn->secret))
 		     , kn->secret.len, "long term secret");

@@ -1043,6 +1043,8 @@ send_v2_notification_from_state(struct state *st, enum isakmp_xchg_types xchg,
 {
     passert(st);
 
+openswan_log("XXX %s:%u st #%lu", __func__, __LINE__, st->st_serialno);
+
     if (xchg == ISAKMP_XCHG_NONE)
 	xchg = ISAKMP_v2_SA_INIT;
 
@@ -1068,6 +1070,8 @@ send_v2_notification_from_md(struct msg_digest *md UNUSED,
      *   st_connection->interface
      */
     passert(md);
+
+openswan_log("XXX %s:%u st ???", __func__, __LINE__);
 
     memset(&st, 0, sizeof(st));
     memset(&cnx, 0, sizeof(cnx));

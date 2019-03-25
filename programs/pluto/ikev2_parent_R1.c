@@ -178,6 +178,7 @@ stf_status ikev2parent_inI1outR1(struct msg_digest *md)
                     return STF_FAIL;
         ke = &md->chain[ISAKMP_NEXT_v2KE]->payload.v2ke;
 
+DBG_log("XXX %s:%u lookup ke->isak_group = %d", __func__, __LINE__, ke->isak_group);
         st->st_oakley.group=lookup_group(ke->isak_group);
         if(st->st_oakley.group==NULL) {
             char fromname[ADDRTOT_BUF];

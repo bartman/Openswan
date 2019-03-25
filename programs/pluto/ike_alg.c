@@ -316,8 +316,10 @@ ike_alg_pfsgroup(struct connection *c, lset_t policy)
 {
 	const struct oakley_group_desc * ret = NULL;
 	if ( (policy & POLICY_PFS) &&
-			c->alg_info_esp && c->alg_info_esp->esp_pfsgroup)
+			c->alg_info_esp && c->alg_info_esp->esp_pfsgroup) {
+DBG_log("XXX %s:%u lookup c->alg_info_esp->esp_pfsgroup = %d", __func__, __LINE__, c->alg_info_esp->esp_pfsgroup);
 		ret = lookup_group(c->alg_info_esp->esp_pfsgroup);
+	}
 	return ret;
 }
 

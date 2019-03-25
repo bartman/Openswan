@@ -562,6 +562,13 @@ delete_state(struct state *st)
     /* tell kernel to delete any IPSEC SA
      * ??? we ought to tell peer to delete IPSEC SAs
      */
+
+DBG_log("STATE %s:%u st=%p #%ld spi=%08x established par=%u chi=%u inb=%u", __func__, __LINE__, st, st->st_serialno,
+	ntohl(st->st_esp.our_spi),
+	IS_IPSEC_SA_ESTABLISHED(st->st_state),
+	IS_CHILD_SA_ESTABLISHED(st),
+	IS_ONLY_INBOUND_IPSEC_SA_ESTABLISHED(st->st_state));
+
     if (IS_IPSEC_SA_ESTABLISHED(st->st_state)
 	|| IS_CHILD_SA_ESTABLISHED(st))
 	delete_ipsec_sa(st, FALSE);

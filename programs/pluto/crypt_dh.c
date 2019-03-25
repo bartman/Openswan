@@ -236,6 +236,14 @@ calc_dh_shared(chunk_t *shared, const chunk_t g
     struct timeval tv0, tv1;
     unsigned long tv_diff;
 
+    DBG_log("XXX group %u bytes %lu", group->group, group->bytes);
+    DBG_dump_chunk("XXX g: ", g);
+    {
+    chunk_t m = mpz_to_n(group->modulus, group->bytes);
+    DBG_dump_chunk("XXX mod: ", m);
+    pfreeany(m.ptr);
+    }
+
     gettimeofday(&tv0, NULL);
     n_to_mpz(&mp_g, g.ptr, g.len);
     mpz_init(&mp_shared);
@@ -1050,6 +1058,37 @@ void calc_dh_iv(struct pluto_crypto_req *r)
     MP_INT  sec;
 #endif
 
+    DBG_log("XXX %s:%u", __func__, __LINE__);
+    DBG_log("XXX r->pcr_len  = %ld", r->pcr_len);
+    DBG_log("XXX r->pcr_type = %d",  r->pcr_type);
+    DBG_log("XXX r->pcr_id   = %d",  r->pcr_id);
+    DBG_log("XXX r->pcr_pcim = %d",  r->pcr_pcim);
+    DBG_log("XXX r->pcr_slot = %d",  r->pcr_slot);
+    DBG_log("XXX r->pcr_success = %d", r->pcr_success);
+    DBG_log("XXX r->pcr_d.dhq.oakley_group = %d", r->pcr_d.dhq.oakley_group);
+    DBG_log("XXX r->pcr_d.dhq.auth         = %d", r->pcr_d.dhq.auth);
+    DBG_log("XXX r->pcr_d.dhq.integ_hash   = %d", r->pcr_d.dhq.integ_hash);
+    DBG_log("XXX r->pcr_d.dhq.prf_hash     = %d", r->pcr_d.dhq.prf_hash);
+    DBG_log("XXX r->pcr_d.dhq.init         = %d", r->pcr_d.dhq.init);
+    DBG_log("XXX r->pcr_d.dhq.keysize      = %ld", r->pcr_d.dhq.keysize);
+
+#define DBG_dump_wire(what) ({                           \
+chunk_t t;                                               \
+setchunk_fromwire(t, &r->pcr_d.dhq.what, &r->pcr_d.dhq); \
+DBG_dump_chunk("XXX " # what, t);                        \
+})
+
+    DBG_dump_wire(gi);
+    DBG_dump_wire(gr);
+    DBG_dump_wire(pss);
+    DBG_dump_wire(ni);
+    DBG_dump_wire(nr);
+    DBG_dump_wire(icookie);
+    DBG_dump_wire(rcookie);
+    DBG_dump_wire(secret);
+
+#undef DBG_dump_wire
+
     /* copy the request, since we will use the same memory for the reply */
     memcpy(&dhq, skq, sizeof(struct pcr_skeyid_q));
 
@@ -1058,8 +1097,13 @@ void calc_dh_iv(struct pluto_crypto_req *r)
     skr->thespace.start = 0;
     skr->thespace.len   = sizeof(skr->space);
 
+DBG_log("XXX %s:%u lookup dhq.oakley_group = %d", __func__, __LINE__, dhq.oakley_group);
     group = lookup_group(dhq.oakley_group);
     passert(group != NULL);
+
+    DBG_log("XXX %s:%u", __func__, __LINE__);
+    DBG_log("XXX group->group              = %d", group->group);
+    DBG_log("XXX group->bytes              = %ld", group->bytes);
 
 #ifndef HAVE_LIBNSS
     pluto_crypto_allocchunk(&skr->thespace
@@ -1159,6 +1203,37 @@ void calc_dh(struct pluto_crypto_req *r)
     chunk_t ltsecret, pubk;
 #endif
 
+    DBG_log("XXX %s:%u", __func__, __LINE__);
+    DBG_log("XXX r->pcr_len  = %ld", r->pcr_len);
+    DBG_log("XXX r->pcr_type = %d",  r->pcr_type);
+    DBG_log("XXX r->pcr_id   = %d",  r->pcr_id);
+    DBG_log("XXX r->pcr_pcim = %d",  r->pcr_pcim);
+    DBG_log("XXX r->pcr_slot = %d",  r->pcr_slot);
+    DBG_log("XXX r->pcr_success = %d", r->pcr_success);
+    DBG_log("XXX r->pcr_d.dhq.oakley_group = %d", r->pcr_d.dhq.oakley_group);
+    DBG_log("XXX r->pcr_d.dhq.auth         = %d", r->pcr_d.dhq.auth);
+    DBG_log("XXX r->pcr_d.dhq.integ_hash   = %d", r->pcr_d.dhq.integ_hash);
+    DBG_log("XXX r->pcr_d.dhq.prf_hash     = %d", r->pcr_d.dhq.prf_hash);
+    DBG_log("XXX r->pcr_d.dhq.init         = %d", r->pcr_d.dhq.init);
+    DBG_log("XXX r->pcr_d.dhq.keysize      = %ld", r->pcr_d.dhq.keysize);
+
+#define DBG_dump_wire(what) ({                           \
+chunk_t t;                                               \
+setchunk_fromwire(t, &r->pcr_d.dhq.what, &r->pcr_d.dhq); \
+DBG_dump_chunk("XXX " # what, t);                        \
+})
+
+    DBG_dump_wire(gi);
+    DBG_dump_wire(gr);
+    DBG_dump_wire(pss);
+    DBG_dump_wire(ni);
+    DBG_dump_wire(nr);
+    DBG_dump_wire(icookie);
+    DBG_dump_wire(rcookie);
+    DBG_dump_wire(secret);
+
+#undef DBG_dump_wire
+
     /* copy the request, since we will use the same memory for the reply */
     memcpy(&dhq, skq, sizeof(struct pcr_skeyid_q));
 
@@ -1166,8 +1241,13 @@ void calc_dh(struct pluto_crypto_req *r)
     zero(skr);
     clear_crypto_space(&skr->thespace, skr->space);
 
+DBG_log("XXX %s:%u lookup dhq.oakley_group = %d", __func__, __LINE__, dhq.oakley_group);
     group = lookup_group(dhq.oakley_group);
     passert(group != NULL);
+
+    DBG_log("XXX %s:%u", __func__, __LINE__);
+    DBG_log("XXX group->group              = %d", group->group);
+    DBG_log("XXX group->bytes              = %ld", group->bytes);
 
 #ifndef HAVE_LIBNSS
     pluto_crypto_allocchunk(&skr->thespace
@@ -1579,6 +1659,37 @@ void calc_dh_v2(struct pluto_crypto_req *r)
     chunk_t pubk;
 #endif
 
+    DBG_log("XXX %s:%u", __func__, __LINE__);
+    DBG_log("XXX r->pcr_len                = %ld", r->pcr_len);
+    DBG_log("XXX r->pcr_type               = %d", r->pcr_type);
+    DBG_log("XXX r->pcr_id                 = %d", r->pcr_id);
+    DBG_log("XXX r->pcr_pcim               = %d", r->pcr_pcim);
+    DBG_log("XXX r->pcr_slot               = %d", r->pcr_slot);
+    DBG_log("XXX r->pcr_success            = %d", r->pcr_success);
+    DBG_log("XXX r->pcr_d.dhq.oakley_group = %d", r->pcr_d.dhq.oakley_group);
+    DBG_log("XXX r->pcr_d.dhq.auth         = %d", r->pcr_d.dhq.auth);
+    DBG_log("XXX r->pcr_d.dhq.integ_hash   = %d", r->pcr_d.dhq.integ_hash);
+    DBG_log("XXX r->pcr_d.dhq.prf_hash     = %d", r->pcr_d.dhq.prf_hash);
+    DBG_log("XXX r->pcr_d.dhq.init         = %d", r->pcr_d.dhq.init);
+    DBG_log("XXX r->pcr_d.dhq.keysize      = %ld", r->pcr_d.dhq.keysize);
+
+#define DBG_dump_wire(dh,what) ({                            \
+chunk_t t;                                                   \
+DBG_log("XXX %s len = %ld", #what, r->pcr_d.dh.what.len);    \
+setchunk_fromwire(t, &r->pcr_d.dh.what, &r->pcr_d.dh);       \
+DBG_dump_chunk("XXX " # what, t);                            \
+})
+
+    DBG_dump_wire(dhq, gi);
+    DBG_dump_wire(dhq, gr);
+    DBG_dump_wire(dhq, pss);
+    DBG_dump_wire(dhq, ni);
+    DBG_dump_wire(dhq, nr);
+    DBG_dump_wire(dhq, icookie);
+    DBG_dump_wire(dhq, rcookie);
+    DBG_dump_wire(dhq, secret);
+
+
     /* copy the request, since we will use the same memory for the reply */
     memcpy(&dhq, skq, sizeof(struct pcr_skeyid_q));
 
@@ -1587,8 +1698,13 @@ void calc_dh_v2(struct pluto_crypto_req *r)
     skr->thespace.start = 0;
     skr->thespace.len   = sizeof(skr->space);
 
+DBG_log("XXX %s:%u lookup dhq.oakley_group = %d", __func__, __LINE__, dhq.oakley_group);
     group = lookup_group(dhq.oakley_group);
     passert(group != NULL);
+
+    DBG_log("XXX %s:%u", __func__, __LINE__);
+    DBG_log("XXX group->group              = %d", group->group);
+    DBG_log("XXX group->bytes              = %ld", group->bytes);
 
 #ifndef HAVE_LIBNSS
     pluto_crypto_allocchunk(&skr->thespace
@@ -1635,6 +1751,9 @@ void calc_dh_v2(struct pluto_crypto_req *r)
     memset(&SK_pi,     0, sizeof(SK_pi));
     memset(&SK_pr,     0, sizeof(SK_pr));
 
+    DBG_log("XXX %s:%u", __func__, __LINE__);
+    DBG_log("XXX dhq.keysize               = %ld", dhq.keysize);
+
     /* okay, so now calculate IV */
     calc_skeyseed_v2(&dhq
 		     , shared
@@ -1660,6 +1779,17 @@ void calc_dh_v2(struct pluto_crypto_req *r)
     setwirechunk_fromchunk(skr->skeyid_pi,SK_pi, skr);
     setwirechunk_fromchunk(skr->skeyid_pr,SK_pr, skr);
 
+    DBG_log("XXX %s:%u", __func__, __LINE__);
+    DBG_dump_wire(dhv2, shared);
+    DBG_dump_wire(dhv2, skeyid_pr);
+    DBG_dump_wire(dhv2, skeyid_d);
+    DBG_dump_wire(dhv2, skeyid_ai);
+    DBG_dump_wire(dhv2, skeyid_ar);
+    DBG_dump_wire(dhv2, skeyid_ei);
+    DBG_dump_wire(dhv2, skeyid_er);
+    DBG_dump_wire(dhv2, skeyid_pi);
+    DBG_dump_wire(dhv2, skeyid_pr);
+
     freeanychunk(shared);
     freeanychunk(skeyseed);
     freeanychunk(SK_d);
@@ -1672,6 +1802,7 @@ void calc_dh_v2(struct pluto_crypto_req *r)
 
     r->pcr_success = TRUE;
     return;
+#undef DBG_dump_wire
 }
 
 /*

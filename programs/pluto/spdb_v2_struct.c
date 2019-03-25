@@ -145,6 +145,7 @@ ikev2_out_sa(pb_stream *outs
 		      , IPPROTO_ESP
 		      , st
 		      , TRUE /* tunnel */);
+DBG_log("IKEv2 %s:%u st->st_esp.our_spi=%08x", __func__, __LINE__, st->st_esp.our_spi);
     }
 
     /* now send out all the proposals */
@@ -878,6 +879,7 @@ ikev2_emit_winning_sa(
 		      , IPPROTO_ESP
 		      , st
 		      , TRUE /* tunnel */);
+DBG_log("IKEv2 %s:%u st->st_esp.our_spi=%08x", __func__, __LINE__, st->st_esp.our_spi);
     }
 
     if(parentSA) {

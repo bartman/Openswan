@@ -71,6 +71,8 @@ stf_status build_ke(struct pluto_crypto_req_cont *cn
     err_t e;
     bool toomuch = FALSE;
 
+DBG_log("XXX %s:%u group=%d start", __func__, __LINE__, group->group);
+
     pcr_init(r, pcr_build_kenonce, importance);
     r->pcr_d.kn.oakley_group   = group->group;
 

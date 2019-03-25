@@ -170,6 +170,16 @@ void calc_ke(struct pluto_crypto_req *r)
 
     group = lookup_group(kn->oakley_group);
 
+DBG_log("XXX %s:%u kn->oakley_group=%d start", __func__, __LINE__, kn->oakley_group);
+#if 0
+{
+int groupnum = 24;
+DBG_log("XXX %s:%u lookup groupnum = %d FORCED!!!", __func__, __LINE__, groupnum);
+group = lookup_group(groupnum);
+}
+#endif
+DBG_log("XXX %s:%u group=%d", __func__, __LINE__, group->group);
+
     pluto_crypto_allocchunk(&kn->thespace
 			    , &kn->secret
 			    , LOCALSECRETSIZE);
@@ -183,6 +193,8 @@ void calc_ke(struct pluto_crypto_req *r)
     oswcrypto.mod_exp(&mp_g, group->generator, &secret, group->modulus);
 
     gi = mpz_to_n(&mp_g, group->bytes);
+
+DBG_log("XXX %s:%u gi.len=%ld", __func__, __LINE__, gi.len);
 
     pluto_crypto_allocchunk(&kn->thespace, &kn->gi, gi.len);
 
@@ -207,6 +219,8 @@ void calc_ke(struct pluto_crypto_req *r)
 void calc_nonce(struct pluto_crypto_req *r)
 {
   struct pcr_kenonce *kn = &r->pcr_d.kn;
+
+DBG_log("XXX %s:%u ...", __func__, __LINE__);
 
   pluto_crypto_allocchunk(&kn->thespace, &kn->n, DEFAULT_NONCE_SIZE);
   get_rnd_bytes(wire_chunk_ptr(kn, &(kn->n)), DEFAULT_NONCE_SIZE);

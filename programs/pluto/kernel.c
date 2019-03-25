@@ -234,6 +234,8 @@ get_ipsec_spi(struct ipsec_proto_info *pi
     static ipsec_spi_t spi = 0; /* host order, so not returned directly! */
     char text_said[SATOT_BUF];
 
+DBG_log("KERNEL %s:%u pi=%p st=%p...", __func__, __LINE__, pi, st);
+
     /* for reasons of esthetics, we avoid using the same spi as the sender */
     ipsec_spi_t avoid = pi->attrs.spi;
 
@@ -246,6 +248,7 @@ get_ipsec_spi(struct ipsec_proto_info *pi
 					  , get_proto_reqid()
 				   , IPSEC_DOI_SPI_OUR_MIN, 0xffffffff
 				   , text_said);
+DBG_log("KERNEL %s:%u our_spi=%08x", __func__, __LINE__, pi->our_spi);
 	return pi->our_spi != 0;
     }
 
@@ -256,6 +259,8 @@ get_ipsec_spi(struct ipsec_proto_info *pi
     DBG(DBG_CONTROL,
         {
             ipsec_spi_t spi_net = htonl(spi);
+
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi_net);
 
             DBG_dump("generate SPI:", (u_char *)&spi_net, sizeof(spi_net));
         });
@@ -279,16 +284,21 @@ get_my_cpi(struct state *st, bool tunnel)
         first_busy_cpi = 0,
         latest_cpi;
     char text_said[SATOT_BUF];
+    ipsec_spi_t spi;
+
+DBG_log("KERNEL %s:%u st=%p...", __func__, __LINE__, st);
 
     set_text_said(text_said, &st->st_localaddr, 0, IPPROTO_COMP);
 
     if (kernel_ops->get_spi) {
 	st->st_ipcomp.our_spi_in_kernel = TRUE;
-        return kernel_ops->get_spi(&st->st_remoteaddr
+        spi = kernel_ops->get_spi(&st->st_remoteaddr
 				   , &st->st_localaddr, IPPROTO_COMP, tunnel
 				   , get_proto_reqid()
 				   , IPCOMP_FIRST_NEGOTIATED, IPCOMP_LAST_NEGOTIATED
 				   , text_said);
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
+        return spi;
     }
 
     while (!(IPCOMP_FIRST_NEGOTIATED <= first_busy_cpi && first_busy_cpi < IPCOMP_LAST_NEGOTIATED))
@@ -305,7 +315,9 @@ get_my_cpi(struct state *st, bool tunnel)
     if (latest_cpi > IPCOMP_LAST_NEGOTIATED)
         latest_cpi = IPCOMP_FIRST_NEGOTIATED;
 
-    return htonl((ipsec_spi_t)latest_cpi);
+    spi = htonl((ipsec_spi_t)latest_cpi);
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
+    return spi;
 }
 
 /* form the command string */
@@ -851,6 +863,8 @@ set_text_said(char *text_said, const ip_address *dst, ipsec_spi_t spi, int proto
 {
     ip_said said;
 
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
+
     initsaid(dst, spi, proto, &said);
     satot(&said, 0, text_said, SATOT_BUF);
 }
@@ -953,6 +967,8 @@ raw_eroute(const ip_address *this_host
     int sport = ntohs(portof(&this_client->addr));
     int dport = ntohs(portof(&that_client->addr));
 
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
+
     subnettot(this_client, 0, mybuf, sizeof(mybuf));
     subnettot(that_client, 0, peerbuf, sizeof(peerbuf));
 
@@ -1050,6 +1066,8 @@ replace_bare_shunt(const ip_address *src, const ip_address *dst
 {
     ip_subnet this_client, that_client;
     const ip_address *null_host = aftoinfo(addrtypeof(src))->any;
+
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, shunt_spi);
 
     passert(addrtypeof(src) == addrtypeof(dst));
     happy(addrtosubnet(src, &this_client));
@@ -1189,6 +1207,8 @@ bool eroute_connection(struct state *st
     const ip_address *null_host = aftoinfo(addrtypeof(&st->st_remoteaddr))->any;
     const ip_address *this, *that;
     char buf2[256];
+
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
 
     snprintf(buf2, sizeof(buf2)
              , "eroute_connection %s", opname);
@@ -1347,6 +1367,8 @@ del_spi(ipsec_spi_t spi, int proto
     char text_said[SATOT_BUF];
     struct kernel_sa sa;
 
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
+
     set_text_said(text_said, dest, spi, proto);
 
     DBG(DBG_KLIPS, DBG_log("delete %s", text_said));
@@ -1386,6 +1408,8 @@ static err_t setup_esp_sa(struct connection *c
     char text_said[SATOT_BUF];
     bool replace = FALSE;
     IPsecSAref_t refhim = st->st_refhim;
+
+DBG_log("KERNEL %s:%u esp_spi=%08xst=%p...", __func__, __LINE__, esp_spi, st);
 
     /* this maps IKE/IETF values into kernel identifiers */
     static const struct esp_info esp_info[] = {
@@ -1651,6 +1675,8 @@ setup_half_ipsec_sa(struct state *parent_st
 
     bool add_selector;
 
+DBG_log("KERNEL %s:%u st=%p...", __func__, __LINE__, st);
+
     srcport_thing[0]='\0'; /* empty string */
     dstport_thing[0]='\0';
 
@@ -1719,6 +1745,7 @@ setup_half_ipsec_sa(struct state *parent_st
     if (kernel_ops->inbound_eroute)
     {
         inner_spi = 256;
+DBG_log("KERNEL %s:%u inner_spi=%08x...", __func__, __LINE__, inner_spi);
         proto = SA_IPIP;
         esatype = ET_IPIP; /* XXX bart: used to be "UNSPEC" */
     }
@@ -1739,6 +1766,7 @@ setup_half_ipsec_sa(struct state *parent_st
             static ipsec_spi_t last_tunnel_spi = IPSEC_DOI_SPI_OUR_MIN;
 
             ipip_spi = htonl(++last_tunnel_spi);
+DBG_log("KERNEL %s:%u ipip_spi=%08x...", __func__, __LINE__, ipip_spi);
             if (inbound)
                 st->st_tunnel_in_spi = ipip_spi;
             else
@@ -1819,6 +1847,7 @@ setup_half_ipsec_sa(struct state *parent_st
 	}
         said_next++;
 
+DBG_log("KERNEL %s:%u inner_spi=%08x...", __func__, __LINE__, inner_spi);
         inner_spi = ipip_spi;
         proto = SA_IPIP;
         esatype = ET_IPIP;
@@ -1831,6 +1860,8 @@ setup_half_ipsec_sa(struct state *parent_st
     {
         ipsec_spi_t ipcomp_spi = inbound? st->st_ipcomp.our_spi : st->st_ipcomp.attrs.spi;
         unsigned compalg;
+
+DBG_log("KERNEL %s:%u ipcomp_spi=%08x...", __func__, __LINE__, ipcomp_spi);
 
         switch (st->st_ipcomp.attrs.transattrs.encrypt)
         {
@@ -1946,6 +1977,8 @@ setup_half_ipsec_sa(struct state *parent_st
         u_char *ah_dst_keymat = inbound? st->st_ah.our_keymat : st->st_ah.peer_keymat;
 
         unsigned char authalg;
+
+DBG_log("KERNEL %s:%u ah_spi=%08x...", __func__, __LINE__, ah_spi);
 
         switch (st->st_ah.attrs.transattrs.integ_hash)
         {
@@ -2090,6 +2123,8 @@ setup_half_ipsec_sa(struct state *parent_st
                 }
             }
 
+DBG_log("KERNEL %s:%u inner_spi=%08x...", __func__, __LINE__, inner_spi);
+
             /* MCR - should be passed a spd_eroute structure here */
             (void) raw_eroute(&st->st_remoteaddr    /* this_host */
 			      , &sr->that.client    /* this_client */
@@ -2126,6 +2161,9 @@ setup_half_ipsec_sa(struct state *parent_st
 
             /* group s[1] and s[0], in that order */
 
+DBG_log("KERNEL %s:%u s0.spi=%08x...", __func__, __LINE__, s[0].spi);
+DBG_log("KERNEL %s:%u s1.spi=%08x...", __func__, __LINE__, s[1].spi);
+
             set_text_said(text_said0, s[0].dst, s[0].spi, s[0].proto);
             set_text_said(text_said1, s[1].dst, s[1].spi, s[1].proto);
 
@@ -2161,6 +2199,7 @@ fail:
         /* undo the done SPIs */
         while (said_next-- != said) {
 	    if(said_next->proto) {
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, said_next->spi);
 		(void) del_spi(said_next->spi, said_next->proto
 			       , &src, said_next->dst);
 	    }
@@ -2187,6 +2226,11 @@ teardown_half_ipsec_sa(struct state *st, struct end *that, bool inbound)
     int i;
     bool result;
 
+DBG_log("KERNEL %s:%u st=%p that=%p inbound=%u...", __func__, __LINE__, st, that, inbound);
+
+DBG_log("KERNEL %s:%u st=%p #%ld eroute_owner=%lx", __func__, __LINE__, st, st->st_serialno,
+	c->spd.eroute_owner);
+
     i = 0;
     if (kernel_ops->inbound_eroute && inbound
         && c->spd.eroute_owner == SOS_NOBODY)
@@ -2202,6 +2246,13 @@ teardown_half_ipsec_sa(struct state *st, struct end *that, bool inbound)
 			  , c->policy_label
 			  );
     }
+
+DBG_log("KERNEL %s:%u st=%p #%ld grp_sa=%p", __func__, __LINE__, st, st->st_serialno,
+	kernel_ops->grp_sa);
+
+DBG_log("KERNEL %s:%u st=%p #%ld ESP spi=%08x present=%d", __func__, __LINE__, st, st->st_serialno,
+	ntohl(st->st_esp.our_spi),
+        st->st_esp.present);
 
     if (!kernel_ops->grp_sa)
     {
@@ -2254,12 +2305,14 @@ teardown_half_ipsec_sa(struct state *st, struct end *that, bool inbound)
         if (inbound)
         {
             spi = protos[i].info->our_spi;
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
             src = &that->host_addr;
             dst = &c->spd.this.host_addr;
         }
         else
         {
             spi = protos[i].info->attrs.spi;
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
             src = &c->spd.this.host_addr;
             dst = &that->host_addr;
         }
@@ -2828,6 +2881,8 @@ route_and_eroute(struct connection *c USED_BY_KLIPS
                  */
                 struct bare_shunt *bs = *bspp;
 
+DBG_log("KERNEL %s:%u bs->said.spi=%08x...", __func__, __LINE__, bs->said.spi);
+
                 (void) raw_eroute(&bs->said.dst /* should be useless */
                     , &bs->ours
                     , &bs->said.dst     /* should be useless */
@@ -3018,6 +3073,9 @@ void
 delete_ipsec_sa(struct state *st USED_BY_KLIPS, bool inbound_only USED_BY_KLIPS)
 {
     struct connection *c = st->st_connection;
+
+DBG_log("KERNEL %s:%u st=%p inbound_only=%u...", __func__, __LINE__, st, inbound_only);
+
     switch (kern_interface) {
     case USE_MASTKLIPS:
     case USE_KLIPS:
@@ -3150,6 +3208,8 @@ get_sa_info(struct state *st, bool inbound, time_t *ago)
 
     struct connection *c = st->st_connection;
 
+DBG_log("KERNEL %s:%u st=%p...", __func__, __LINE__, st);
+
     if (kernel_ops->get_sa == NULL || !st->st_esp.present)
 	return FALSE;
 
@@ -3160,12 +3220,14 @@ get_sa_info(struct state *st, bool inbound, time_t *ago)
 	src = &c->spd.that.host_addr;
 	dst = &c->spd.this.host_addr;
 	spi = st->st_esp.our_spi;
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
     }
     else
     {
 	src = &c->spd.this.host_addr;
 	dst = &c->spd.that.host_addr;
 	spi = st->st_esp.attrs.spi;
+DBG_log("KERNEL %s:%u spi=%08x...", __func__, __LINE__, spi);
     }
     set_text_said(text_said, dst, spi, proto);
 
