@@ -1502,6 +1502,7 @@ accept_v2_KE(struct msg_digest *md, struct state *st, chunk_t *ke, const char *n
         u_int16_t group_number = htons(st->st_oakley.group->group);
         dc.ptr = (unsigned char *)&group_number;
         dc.len = 2;
+openswan_log("XXX %s:%u rn=%d group=%d", __func__, __LINE__, rn, st->st_oakley.group->group);
         SEND_V2_NOTIFICATION_DATA(md, st, v2N_INVALID_KE_PAYLOAD, &dc);
         delete_state(st);
         return STF_FAIL + rn;
