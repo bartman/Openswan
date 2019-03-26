@@ -1498,8 +1498,7 @@ accept_v2_KE(struct msg_digest *md, struct state *st, chunk_t *ke, const char *n
         u_int16_t group_number = htons(st->st_oakley.group->group);
         dc.ptr = (unsigned char *)&group_number;
         dc.len = 2;
-	if (rn != v2N_INVALID_KE_PAYLOAD)
-            SEND_V2_NOTIFICATION_DATA(md, st, v2N_INVALID_KE_PAYLOAD, &dc);
+        SEND_V2_NOTIFICATION_DATA(md, st, v2N_INVALID_KE_PAYLOAD, &dc);
         delete_state(st);
         return STF_FAIL + rn;
     }
