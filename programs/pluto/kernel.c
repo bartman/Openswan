@@ -850,8 +850,10 @@ DBG_log("KERNEL %s:%u ...", __func__, __LINE__);
         sr->routing = RT_UNROUTED;  /* do now so route_owner won't find us */
 
         /* only unroute if no other connection shares it */
-        if (routed(cr) && route_owner(c, sr, NULL, NULL, NULL) == NULL)
+        if (routed(cr) && route_owner(c, sr, NULL, NULL, NULL) == NULL) {
+DBG_log("KERNEL %s:%u command unroute", __func__, __LINE__);
             (void) do_command(c, sr, "unroute", NULL);
+	}
     }
 }
 
@@ -2719,6 +2721,7 @@ DBG_log("KERNEL %s:%u ...", __func__, __LINE__);
 	    loglog(RC_LOG_SERIOUS
 	    	, "Maximum number of IPSec connections reached (%d)"
 		, IPSEC_CONNECTION_LIMIT);
+DBG_log("KERNEL %s:%u return FALSE", __func__, __LINE__);
 	    return FALSE;
 	}
 	new_eroute = TRUE;
@@ -2742,6 +2745,10 @@ DBG_log("KERNEL %s:%u ...", __func__, __LINE__);
          * tunnel would have to be for our connection, so the actual
          * test is simple.
          */
+DBG_log("KERNEL %s:%u up ? %s %s", __func__, __LINE__,
+	st == NULL ? "st == NULL" : "",
+	sr->eroute_owner != SOS_NOBODY ? "SOS_NOBODY" : "");
+
         firewall_notified = st == NULL  /* not a tunnel eroute */
             || sr->eroute_owner != SOS_NOBODY   /* already notified */
             || do_command(c, sr, "up", st); /* go ahead and notify */
@@ -2759,7 +2766,9 @@ DBG_log("KERNEL %s:%u ...", __func__, __LINE__);
     else if (ro == NULL)
     {
         /* a new route: no deletion required, but preparation is */
+DBG_log("KERNEL %s:%u prepare", __func__, __LINE__);
         (void) do_command(c, sr, "prepare", st);    /* just in case; ignore failure */
+DBG_log("KERNEL %s:%u route", __func__, __LINE__);
         route_installed = do_command(c, sr, "route", st);
     }
     else if (routed(sr->routing)
@@ -2780,12 +2789,16 @@ DBG_log("KERNEL %s:%u ...", __func__, __LINE__);
          */
         if (sameaddr(&sr->this.host_nexthop, &esr->this.host_nexthop))
         {
+DBG_log("KERNEL %s:%u unroute", __func__, __LINE__);
             (void) do_command(ro, sr, "unroute", st);
+DBG_log("KERNEL %s:%u route", __func__, __LINE__);
             route_installed = do_command(c, sr, "route", st);
         }
         else
         {
+DBG_log("KERNEL %s:%u route", __func__, __LINE__);
             route_installed = do_command(c, sr, "route", st);
+DBG_log("KERNEL %s:%u unroute", __func__, __LINE__);
             (void) do_command(ro, sr, "unroute", st);
         }
 
@@ -2861,13 +2874,16 @@ DBG_log("KERNEL %s:%u ...", __func__, __LINE__);
 	}
 #endif
 
+DBG_log("KERNEL %s:%u return TRUE", __func__, __LINE__);
         return TRUE;
     }
     else
     {
         /* Failure!  Unwind our work. */
-        if (firewall_notified && sr->eroute_owner == SOS_NOBODY)
+        if (firewall_notified && sr->eroute_owner == SOS_NOBODY) {
+DBG_log("KERNEL %s:%u down", __func__, __LINE__);
             (void) do_command(c, sr, "down", st);
+	}
 
         if (eroute_installed)
         {
@@ -2935,6 +2951,7 @@ DBG_log("KERNEL %s:%u bs->said.spi=%08x...", __func__, __LINE__, bs->said.spi);
             }
         }
 
+DBG_log("KERNEL %s:%u return FALSE", __func__, __LINE__);
         return FALSE;
     }
 }
@@ -3059,6 +3076,7 @@ install_ipsec_sa(struct state *parent_st
 	st->st_connection->spd.routing = sr->routing;
 
 	if(!st->st_connection->newest_ipsec_sa) {
+DBG_log("KERNEL %s:%u updateresolvconf", __func__, __LINE__);
 		if(!do_command(st->st_connection, &st->st_connection->spd, "updateresolvconf", st)) {
 		DBG(DBG_CONTROL, DBG_log("Updating resolv.conf failed, you may need to update it manually"));
 		}
@@ -3111,6 +3129,7 @@ DBG_log("KERNEL %s:%u st=%p inbound_only=%u...", __func__, __LINE__, st, inbound
 			continue;
 		    }
 
+DBG_log("KERNEL %s:%u down", __func__, __LINE__);
 		    (void) do_command(c, sr, "down", st);
 		    if ((c->policy & POLICY_DONT_REKEY)
 			&& c->kind == CK_INSTANCE)
@@ -3153,6 +3172,7 @@ DBG_log("KERNEL %s:%u st=%p inbound_only=%u...", __func__, __LINE__, st, inbound
 #endif
 
 	if (st->st_connection->remotepeertype == CISCO && st->st_serialno == st->st_connection->newest_ipsec_sa) {
+DBG_log("KERNEL %s:%u restoreresolvconf", __func__, __LINE__);
 		if(!do_command(st->st_connection, &st->st_connection->spd, "restoreresolvconf", st)) {
 		DBG(DBG_CONTROL, DBG_log("Restoring resolv.conf failed, you may need to do it manually"));
 		}
