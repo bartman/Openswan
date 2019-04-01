@@ -823,6 +823,7 @@ unroute_connection(struct connection *c)
     struct spd_route *sr;
     enum routing_t cr;
 
+DBG_log("KERNEL %s:%u ...", __func__, __LINE__);
 #if 0
     /* useful for debugging situations where newest_*_SA/eroute is going wrong */
     DBG_log("unroute connection");
@@ -2647,6 +2648,8 @@ route_and_eroute(struct connection *c USED_BY_KLIPS
 #endif
 
     struct bare_shunt **bspp;
+
+DBG_log("KERNEL %s:%u ...", __func__, __LINE__);
 
     ro = route_owner(c, sr, &rosr, &ero, &esr);
 

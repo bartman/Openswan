@@ -449,6 +449,7 @@ send_netlink_msg(struct nlmsghdr *hdr, struct nlmsghdr *rbuf, size_t rbuf_len
 
     if (kern_interface == NO_KERNEL)
     {
+DBG_log("NETLINK %s:%u return TRUE", __func__, __LINE__);
 	return TRUE;
     }
 
@@ -464,6 +465,7 @@ send_netlink_msg(struct nlmsghdr *hdr, struct nlmsghdr *rbuf, size_t rbuf_len
 	      " for %s %s failed"
 	    , sparse_val_show(xfrm_type_names, hdr->nlmsg_type)
 	    , description, text_said));
+DBG_log("NETLINK %s:%u return FALSE", __func__, __LINE__);
 	return FALSE;
     }
     else if ((size_t)r != len)
@@ -474,6 +476,7 @@ send_netlink_msg(struct nlmsghdr *hdr, struct nlmsghdr *rbuf, size_t rbuf_len
 	    , sparse_val_show(xfrm_type_names, hdr->nlmsg_type)
 	    , description, text_said
 	    , (long)r, (unsigned long)len);
+DBG_log("NETLINK %s:%u return FALSE", __func__, __LINE__);
 	return FALSE;
     }
 
@@ -494,6 +497,7 @@ send_netlink_msg(struct nlmsghdr *hdr, struct nlmsghdr *rbuf, size_t rbuf_len
 		  " for %s %s failed"
 		, sparse_val_show(xfrm_type_names, hdr->nlmsg_type)
 		, description, text_said));
+DBG_log("NETLINK %s:%u return FALSE", __func__, __LINE__);
 	    return FALSE;
 	}
 	else if ((size_t) r < sizeof(rsp.n))
@@ -530,6 +534,7 @@ send_netlink_msg(struct nlmsghdr *hdr, struct nlmsghdr *rbuf, size_t rbuf_len
 	    , sparse_val_show(xfrm_type_names, hdr->nlmsg_type)
 	    , description, text_said
 	    , (long) len, (unsigned long) rsp.n.nlmsg_len);
+DBG_log("NETLINK %s:%u return FALSE", __func__, __LINE__);
 	return FALSE;
     }
     else if (rsp.n.nlmsg_type != NLMSG_ERROR
@@ -541,6 +546,7 @@ send_netlink_msg(struct nlmsghdr *hdr, struct nlmsghdr *rbuf, size_t rbuf_len
 	    , sparse_val_show(xfrm_type_names, hdr->nlmsg_type)
 	    , description, text_said
 	    , sparse_val_show(xfrm_type_names, rsp.n.nlmsg_type));
+DBG_log("NETLINK %s:%u return FALSE", __func__, __LINE__);
 	return FALSE;
     }
     else if (rbuf)
@@ -553,9 +559,11 @@ send_netlink_msg(struct nlmsghdr *hdr, struct nlmsghdr *rbuf, size_t rbuf_len
 		, sparse_val_show(xfrm_type_names, hdr->nlmsg_type)
 		, description, text_said
 		, (long)r, (unsigned long)rbuf_len);
+DBG_log("NETLINK %s:%u return FALSE", __func__, __LINE__);
 	    return FALSE;
 	}
 	memcpy(rbuf, &rsp, r);
+DBG_log("NETLINK %s:%u return TRUE", __func__, __LINE__);
 	return TRUE;
     }
     else if (rsp.n.nlmsg_type == NLMSG_ERROR && rsp.e.error)
@@ -565,9 +573,11 @@ send_netlink_msg(struct nlmsghdr *hdr, struct nlmsghdr *rbuf, size_t rbuf_len
 	    , description, text_said
 	    , -rsp.e.error
 	    , strerror(-rsp.e.error));
+DBG_log("NETLINK %s:%u return FALSE", __func__, __LINE__);
 	return FALSE;
     }
 
+DBG_log("NETLINK %s:%u return TRUE", __func__, __LINE__);
     return TRUE;
 }
 
@@ -593,17 +603,20 @@ DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
     rsp.n.nlmsg_type = NLMSG_ERROR;
     if (!send_netlink_msg(hdr, &rsp.n, sizeof(rsp), "policy", text_said))
     {
+DBG_log("NETLINK %s:%u return FALSE", __func__, __LINE__);
 	return FALSE;
     }
 
     error = -rsp.e.error;
     if (!error)
     {
+DBG_log("NETLINK %s:%u return TRUE", __func__, __LINE__);
 	return TRUE;
     }
 
     if (error == ENOENT && enoent_ok)
     {
+DBG_log("NETLINK %s:%u return TRUE", __func__, __LINE__);
 	return TRUE;
     }
 
@@ -613,6 +626,8 @@ DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 	, text_said
 	, error
 	, strerror(error));
+
+DBG_log("NETLINK %s:%u return FALSE", __func__, __LINE__);
     return FALSE;
 }
 
@@ -695,11 +710,13 @@ DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 	    case SPI_TRAPSUBNET:
                 if (sadb_op == ERO_ADD_INBOUND || sadb_op == ERO_DEL_INBOUND)
 		    {
+DBG_log("NETLINK %s:%u return TRUE", __func__, __LINE__);
                         return TRUE;
 		    }
                 break;
                 /* Do we really need %hold under NETKEY? Seems not so we just ignore. */
 	    case SPI_HOLD:
+DBG_log("NETLINK %s:%u return TRUE", __func__, __LINE__);
                 return TRUE;
 	    }
     }
@@ -907,6 +924,7 @@ DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 	enoent_ok = TRUE;
     }
 
+DBG_log("NETLINK %s:%u -> netlink_policy", __func__, __LINE__);
     ok = netlink_policy(&req.n, enoent_ok, text_said);
     switch (dir)
     {
@@ -928,10 +946,12 @@ DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
 	{
 	    req.u.p.dir = XFRM_POLICY_FWD;
 	}
+DBG_log("NETLINK %s:%u -> netlink_policy", __func__, __LINE__);
 	ok &= netlink_policy(&req.n, enoent_ok, text_said);
 	break;
     }
 
+DBG_log("NETLINK %s:%u ok=%d", __func__, __LINE__, ok);
     return ok;
 }
 
@@ -2475,7 +2495,7 @@ netkey_do_command(struct connection *c, const struct spd_route *sr
     char cmd[2048];     /* arbitrary limit on shell command length */
     char common_shell_out_str[2048];
 
-DBG_log("NETLINK %s:%u ...", __func__, __LINE__);
+DBG_log("NETLINK %s:%u c='%s' verb='%s' suffix='%s'", __func__, __LINE__, c->name, verb, verb_suffix);
 
     if(fmt_common_shell_out(common_shell_out_str, sizeof(common_shell_out_str), c, sr, st)==-1) {
 	loglog(RC_LOG_SERIOUS, "%s%s command too long!", verb, verb_suffix);
