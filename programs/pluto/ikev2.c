@@ -1487,11 +1487,18 @@ void complete_v2_state_transition(struct msg_digest **mdp
 stf_status
 accept_v2_KE(struct msg_digest *md, struct state *st, chunk_t *ke, const char *name)
 {
+    struct ikev2_ke *v2ke;
     pb_stream *keyex_pbs;
     v2_notification_t rn;
     chunk_t dc;
+
     if (md->chain[ISAKMP_NEXT_v2KE] == NULL)
         return STF_FAIL;
+
+    v2ke = &md->chain[ISAKMP_NEXT_v2KE]->payload.v2ke;
+
+openswan_log("XXX %s:%u st->st_oakley.group = %u", __func__, __LINE__, st->st_oakley.group->group);
+openswan_log("XXX %s:%u v2ke { len=%u, group=%u }", __func__, __LINE__, v2ke->isak_length, v2ke->isak_group);
 
     keyex_pbs = &md->chain[ISAKMP_NEXT_v2KE]->pbs;
 
