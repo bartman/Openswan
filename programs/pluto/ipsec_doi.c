@@ -712,6 +712,9 @@ decode_peer_id(struct msg_digest *md, bool initiator, bool aggrmode)
 	struct connection *c = st->st_connection;
 	struct connection *r;
 
+DBG_log("CONN %s:%u c{name=\'%s',kind=%d,instance=%ld}", __func__, __LINE__,
+	c->name, c->kind, c->instance_serial);
+
 	/* check for certificate requests */
 	decode_cr(md, &c->requested_ca);
 
@@ -737,6 +740,9 @@ decode_peer_id(struct msg_digest *md, bool initiator, bool aggrmode)
 
 	    dntoa_or_null(buf, IDTOA_BUF, r->spd.this.ca, "%none");
 	    DBG_log("offered CA: '%s'", buf));
+
+DBG_log("CONN %s:%u r{name=\'%s',kind=%d,instance=%ld}", __func__, __LINE__,
+	r->name, r->kind, r->instance_serial);
 
         if (r->kind == CK_TEMPLATE || r->kind == CK_GROUP) {
             /* instantiate it, filling in peer's ID */

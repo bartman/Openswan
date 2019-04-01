@@ -1454,6 +1454,9 @@ instantiate(struct connection *c, const ip_address *him
 
     d->kind = CK_INSTANCE;
 
+DBG_log("CONN %s:%u c=\'%s' INSTANCE %ld", __func__, __LINE__,
+	c->name, d->instance_serial);
+
     passert(oriented(*d));
     d->spd.that.host_addr = *him;
     setportof(htons(c->spd.that.port), &d->spd.that.host_addr);
@@ -1494,7 +1497,11 @@ rw_instantiate(struct connection *c
                , const ip_subnet *his_net
                , const struct id *his_id)
 {
-    struct connection *d = instantiate(c, him, his_id);
+    struct connection *d;
+
+DBG_log("CONN %s:%u c=\'%s'", __func__, __LINE__, c->name);
+
+    d = instantiate(c, him, his_id);
 
     if (d && his_net && is_virtual_connection(c)) {
 	d->spd.that.client = *his_net;
@@ -1602,7 +1609,11 @@ oppo_instantiate(struct connection *c
 		 , const ip_address *our_client USED_BY_DEBUG
 		 , const ip_address *peer_client)
 {
-    struct connection *d = instantiate(c, him, his_id);
+    struct connection *d;
+
+DBG_log("CONN %s:%u c=\'%s'", __func__, __LINE__, c->name);
+
+    d = instantiate(c, him, his_id);
 
     DBG(DBG_CONTROL,
 	DBG_log("oppo instantiate d=%s from c=%s with c->routing %s, d->routing %s"

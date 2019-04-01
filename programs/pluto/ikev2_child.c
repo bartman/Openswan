@@ -795,6 +795,9 @@ stf_status ikev2_child_sa_respond(struct msg_digest *md
         }
     }
 
+DBG_log("CONN %s:%u c{name=\'%s',kind=%d,instance=%ld}", __func__, __LINE__,
+	c->name, c->kind, c->instance_serial);
+
     /*
      * now look at provided TSx, and see if these fit the connection
      * that we have, and narrow them if necessary.
@@ -914,6 +917,9 @@ stf_status ikev2_child_sa_respond(struct msg_digest *md
 	 * the state structure as the tsi/tsr, perhaps after instantiating it.
 	 *
 	 */
+
+DBG_log("CONN %s:%u b{name=\'%s',kind=%d,instance=%ld}", __func__, __LINE__,
+	b->name, b->kind, b->instance_serial);
 
         if (b->kind == CK_TEMPLATE || b->kind == CK_GROUP) {
             /* instantiate it, filling in peer's ID */
