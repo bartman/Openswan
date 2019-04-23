@@ -6,7 +6,7 @@ In this test case, there are two keys loaded (via twosecrets.secrets),
 and pluto must pick the one that corresponds to the public mentioned in
 leftrsasigkey=.  This is key: AQN7wUerV, the 2048 bit one.
 
-It is a copy of lp10-parentI2 and ct10.
+It is a copy of lp010-parentI2 and ct10.
 
 
 

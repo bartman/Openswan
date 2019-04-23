@@ -13,7 +13,7 @@
 # for more details.
 
 OPENSWANSRCDIR?=$(shell cd ../../../..; pwd)
-srcdir?=${OPENSWANSRCDIR}/tests/unit/libpluto/lp01-spdbtest
+srcdir?=${OPENSWANSRCDIR}/tests/unit/libpluto/lp001-spdbtest
 include $(OPENSWANSRCDIR)/Makefile.inc
 
 EXTRAFLAGS+=${USERCOMPILE} ${PORTINCLUDE}

@@ -1,4 +1,4 @@
-#include "../lp10-parentI2/parentI2_head.c"
+#include "../lp010-parentI2/parentI2_head.c"
 #include "seam_gi_sha1.c"
 #include "seam_gi_sha1_group14.c"
 #include "seam_finish.c"
@@ -24,7 +24,7 @@ static void init_fake_secrets(void)
 
 static void init_loaded(void) {}
 
-#include "../lp10-parentI2/parentI2_main.c"
+#include "../lp010-parentI2/parentI2_main.c"
 
  /*
  * Local Variables:

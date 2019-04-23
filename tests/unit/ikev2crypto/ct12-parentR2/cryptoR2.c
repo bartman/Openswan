@@ -1,4 +1,4 @@
-#include "../../libpluto/lp12-parentR2/parentR2_head.c"
+#include "../../libpluto/lp012-parentR2/parentR2_head.c"
 #include "seam_host_jamesjohnson.c"
 #include "seam_x509.c"
 #include "seam_gr_sha1_group14.c"
@@ -28,7 +28,7 @@ recv_pcap recv_inputs[PCAP_INPUT_COUNT]={
     recv_pcap_packet2,
 };
 
-#include "../../libpluto/lp12-parentR2/parentR2_main.c"
+#include "../../libpluto/lp012-parentR2/parentR2_main.c"
 
  /*
  * Local Variables:

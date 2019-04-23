@@ -1,3 +1,0 @@
-This case tests the orient() function.
-It's like lp34, only instead of loading network information, it loads
-private keys.

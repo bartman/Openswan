@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # this script generates a series of self-signed certificates for moon and dave.
-# These are used in the lp52-55 series of tests.
+# These are used in the lp052-55 series of tests.
 
 set -x
 for HOST in moon dave

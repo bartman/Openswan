@@ -1,5 +1,5 @@
 This test case is an IKEv2 responder. This test is identical in concept to
-lp12-parentR2, except that when generating the reply, it uses the proper
+lp012-parentR2, except that when generating the reply, it uses the proper
 cryptographic routines.
 
 This test case receives a second (I2) packet from the initiator.

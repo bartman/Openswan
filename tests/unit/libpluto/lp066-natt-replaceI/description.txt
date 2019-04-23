@@ -1,0 +1,9 @@
+This test case is a continuation of lp061,lp062,lp063,lp064,lp065, where the
+initiator is behind NAT.
+
+In this test case, the IKEv2 original initiator is attempting to replace the
+IKE (parent) SA.  The action is triggered through EVENT_SA_REPLACE.  This
+results in a INFORMATIONAL/D message being emitted, and a new IKE (parent) SA
+initiated.
+
+This test case uses R1/R2 pcap files from lp061~lp065.
