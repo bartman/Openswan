@@ -24,9 +24,9 @@ processing whack msg time: X size: Y
 | orient any1--jj2 checking against if: eth0 (AF_INET:132.213.238.7:500)
 |     orient matched on IP
 |   orient any1--jj2 finished with: 1 [132.213.238.7]
-| find_host_pair: looking for me=132.213.238.7:500 %any him=0.0.0.0:500 exact-match
+| find_host_pair: looking for me=132.213.238.7:500 %any him=<invalid>:500 exact-match
 | find_host_pair: concluded with <none>
-| connect_to_host_pair: 132.213.238.7:500 %any 0.0.0.0:500 -> hp:none
+| connect_to_host_pair: 132.213.238.7:500 %any <invalid>:500 -> hp:none
 | find_ID_host_pair: looking for me=@jamesjohnson.emmjay.credil.org him=@parker01.emmjay.credil.org (exact)
 |   concluded with <none>
 ./parentR1 adding connection: "any1--jj2"
@@ -35,7 +35,7 @@ processing whack msg time: X size: Y
 |   orient any1--jj2 finished with: 1 [132.213.238.7]
 RC=0 "any1--jj2": fd68:c9f9:4157::/64===132.213.238.7[@jamesjohnson.emmjay.credil.org]...%any[@parker01.emmjay.credil.org]===fd68:c9f9:4157:2:0:1::/96; unrouted; eroute owner: #0
 RC=0 "any1--jj2":     myip=unset; hisip=unset;
-RC=0 "any1--jj2":   ike_life: 3600s; ipsec_life: 28800s; rekey_margin: 540s; rekey_fuzz: 100%; keyingtries: 0
+RC=0 "any1--jj2":   ike_life: 3600s; ipsec_life: 28800s; rekey_margin: 540s; rekey_fuzz: 100%; keyingtries: 0; firstmsgid: 655362
 RC=0 "any1--jj2":   policy: RSASIG+ENCRYPT+TUNNEL+PFS+IKEv2ALLOW+IKEv2Init+SAREFTRACK; prio: 64,96; interface: eth0; kind=CK_PERMANENT
 |   =========== input from pcap file parker1.pcap ========
 | *received 864 bytes from 192.168.1.1:500 on eth0 (port=500)
@@ -94,7 +94,8 @@ RC=0 "any1--jj2":   policy: RSASIG+ENCRYPT+TUNNEL+PFS+IKEv2ALLOW+IKEv2Init+SAREF
 |   30 a3 e0 94  4c dc 91 5b  b0 95 3c 48  70 73 62 f1
 |   00 00 00 10  4f 45 70 6c  75 74 6f 75  6e 69 74 30
 |  processing version=2.0 packet with exchange type=ISAKMP_v2_SA_INIT (34), msgid: 00000000
-| I am IKE SA Responder
+| I am the IKE SA Responder
+| I am this exchange's Responder
 | ICOOKIE:  80 01 02 03  04 05 06 07
 | RCOOKIE:  00 00 00 00  00 00 00 00
 | state hash entry 4
@@ -104,16 +105,16 @@ RC=0 "any1--jj2":   policy: RSASIG+ENCRYPT+TUNNEL+PFS+IKEv2ALLOW+IKEv2Init+SAREF
 | state hash entry 4
 | v2 state object not found
 | considering state entry: 0
-|   reject:state needed and state unavailable
+|   reject: received request, needs response message
 | considering state entry: 1
-|   reject:state needed and state unavailable
+|   reject: received request, needs response message
 | considering state entry: 2
-|   reject:state needed and state unavailable
+|   reject: received request, needs response message
 | considering state entry: 3
 | now proceed with state specific processing using state #3 responder-V2_init
 | find_host_connection2 called from ikev2parent_inI1outR1, me=132.213.238.7:500 him=192.168.1.1:500 policy=IKEv2ALLOW/-
 | find_host_pair: looking for me=132.213.238.7:500 %address him=192.168.1.1:500 any-match
-| find_host_pair: comparing to me=132.213.238.7:500 %any him=0.0.0.0:500
+| find_host_pair: comparing to me=132.213.238.7:500 %any him=<invalid>:500
 | find_host_pair: concluded with any1--jj2
 | found_host_pair_conn (find_host_connection2): 132.213.238.7:500 %address/192.168.1.1:500 -> hp:any1--jj2
 | searching for connection with policy = IKEv2ALLOW/-
