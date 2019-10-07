@@ -815,7 +815,7 @@ sending 432 bytes for STATE_IKEv2_START through eth0:500 [132.213.238.7:500] to 
 |        serial:   00:97:0e:8b:2a:0a:5c:93:14
 |        pubkey:   2048 RSA Key AwEAAcX4z
 |        validity: not before Jan 16 04:06:01 UTC 2017 ok
-|                  not after  Nov 06 04:06:01 UTC 2019 ok
+|                  not after  Nov 06 04:06:01 UTC 2019 warning (expires SOMETIME)
 |        subjkey:  59:66:24:60:e3:19:04:94:c0:a6:6a:56:18:61:1d:d4:84:b3:3e:e1
 |        authkey:  59:66:24:60:e3:19:04:94:c0:a6:6a:56:18:61:1d:d4:84:b3:3e:e1
 | NOW, count: 1
@@ -824,7 +824,7 @@ sending 432 bytes for STATE_IKEv2_START through eth0:500 [132.213.238.7:500] to 
 |        serial:   00:ab:a6:25:3b:bc:02:32:ec
 |        pubkey:   2048 RSA Key AwEAAcEYl
 |        validity: not before Jan 16 04:06:01 UTC 2017 ok
-|                  not after  Nov 06 04:06:01 UTC 2019 ok
+|                  not after  Nov 06 04:06:01 UTC 2019 warning (expires SOMETIME)
 |        subjkey:  2b:8e:6b:ad:6f:22:a2:ea:91:1e:0d:e6:ed:ca:25:2c:89:e0:ae:a3
 |        authkey:  2b:8e:6b:ad:6f:22:a2:ea:91:1e:0d:e6:ed:ca:25:2c:89:e0:ae:a3
 | checking alg=1 == 1, keyid=dave@openswan.org same_id=1
