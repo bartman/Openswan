@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     /* load all conns marked as auto=add or better */
     for(; argc>0; argc--, argv++) {
 	struct whack_message msg1;
+int dump;
 
 	conn_name = *argv;
 	printf("%s: was requested\n", conn_name);
@@ -107,8 +108,22 @@ int main(int argc, char *argv[])
 	}
 	printf("%s: was loaded\n", conn_name);
 
+dump = conn->options_set[KBF_FIRSTMSGID]
+		&& !(conn->options[KBF_FIRSTMSGID] == 0 || conn->options[KBF_FIRSTMSGID] == 1);
+if (dump) {
+printf("%s: conn->options_set[KBF_FIRSTMSGID] = %d\n", conn_name, conn->options_set[KBF_FIRSTMSGID]);
+printf("%s: conn->options[KBF_FIRSTMSGID] = %d\n",     conn_name, conn->options[KBF_FIRSTMSGID]);
+}
+
 	if(starter_whack_build_basic_conn(cfg, &msg1, conn)==0) {
 	    printf("%s: calling add_connection()\n", conn_name);
+
+dump |= msg1.first_msgid != 0 && msg1.first_msgid != 1;
+
+if (dump) {
+printf("%s: msg1.first_msgid = %d\n", conn_name, msg1.first_msgid);
+}
+
 	    add_connection(&msg1);
 	}
 
